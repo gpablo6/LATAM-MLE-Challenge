@@ -36,6 +36,14 @@ class DelayModel:
             'model.pkl'
         )
 
+    def _load_model(self) -> None:
+        """
+        Load the latest available model.
+        """
+        if self._model is None:
+            with open(self._model_path, 'rb') as file:
+                self._model = pickle.load(file)
+
     def preprocess(
         self,
         data: pd.DataFrame,
@@ -159,9 +167,10 @@ class DelayModel:
         Returns:
             (List[int]): predicted targets.
         """
-        # Load the model if not in memory.
+        # Check the model is correctly loaded.
         if self._model is None:
-            with open(self._model_path, 'rb') as file:
-                self._model = pickle.load(file)
+            raise ValueError(
+                'Model not loaded.'
+            )
         # Predict the target.
         return self._model.predict(features)
