@@ -3,6 +3,8 @@ Utilities functions for the model.
 """
 
 # Standard library imports
+import os
+import pathlib
 from datetime import datetime
 # Third-party imports
 import numpy as np
@@ -98,3 +100,42 @@ def get_balance_scale(
     return {
         'scale_pos_weight': balance
     }
+
+
+def get_root_path() -> pathlib.Path | None:
+    """
+    Get's the root path of the project.
+
+    Returns
+    -------
+    root_path : str
+        Path to the root folder of the project.
+
+    Warnings
+    --------
+    This solution only considers the execution of the app from the
+    root directory, not as an executable package.
+    """
+    current_dir = pathlib.Path(__file__).parent
+    current_iteration = 0
+    final_path: pathlib.Path
+    MAX_ITERATIONS = 10
+    while current_iteration <= MAX_ITERATIONS:
+        # Look for the __init__.py file
+        files = os.listdir(current_dir)
+        # Check if the file is in the current directory
+        if 'challenge' in files:
+            final_path = current_dir.absolute()
+            break
+        # Replace dir and prepare next iteration.
+        parent_dir = current_dir.parent
+        # Check if the parent dir is the same as the current dir.
+        # Means we are at the root folder. Early stop iteration.
+        if current_dir == parent_dir:
+            raise ValueError(
+                'Reached root folder without finding __init__.py'
+            )
+        # Update the current dir and iteration.
+        current_dir = parent_dir
+        current_iteration += 1
+    return final_path if final_path else None
