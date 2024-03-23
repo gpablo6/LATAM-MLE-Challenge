@@ -14,6 +14,7 @@ Flask-Cors==4.0.0
 gevent==24.2.1
 geventhttpclient==2.0.12
 greenlet==3.0.3
+gunicorn==21.2.0
 h11==0.14.0
 idna==3.6
 iniconfig==2.0.0
