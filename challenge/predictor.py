@@ -2,6 +2,8 @@
 Predictor service for model.
 """
 
+# Standar Library
+import os
 # Third-Party Libraries
 import pandas as pd
 from fastapi import HTTPException
@@ -54,6 +56,9 @@ class Predictor(object):
         # Create model instance
         self._model_instance = DelayModel()
         # Load the model
+        if os.environ['ENVIROMENT'] == 'production':
+            # Update path for production environment.
+            self._model_instance._model_path = '/opt/ml/model/custom-model.pkl'
         self._model_instance._load_model()
         # Load the data
         root_path = get_root_path()

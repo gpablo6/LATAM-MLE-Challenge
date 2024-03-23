@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+"""
+Main module for training the custom model.
+"""
+
+# Standar Library
+import sys
+import os
+import traceback
+import pathlib
+# Third-Party Imports
+import pandas as pd
+# Local imports
+from .model import DelayModel
+from .utils import get_root_path
+
+
+# Constants
+root_path = pathlib.Path('/opt/ml/')
+output_path = os.path.join(root_path, 'output')
+model_path = os.path.join(root_path, 'model/custom-model.pkl')
+
+
+def train() -> None:
+    """
+    Core function for training the model.
+    """
+    # Load the data
+    root_path = get_root_path()
+    data_path = root_path / 'data' / 'data.csv'
+    data = pd.read_csv(data_path)
+    # Create model instance
+    model = DelayModel()
+    # Update model path for saving
+    model._model_path = model_path
+    # Pre process the data
+    X, y = model.preprocess(data, target_column='delay')
+    # Train the model
+    model.fit(
+        X,
+        y
+    )
+
+
+# Run the training pipeline.
+if __name__ == "__main__":
+    try:
+        train()
+        # A zero exit code causes the job to be marked a Succeeded.
+        sys.exit(0)
+    except Exception as e:
+        # Write out an error file. This will be returned as the `failureReason`
+        # in the `DescribeTrainingJob` result.
+        trace = traceback.format_exc()
+        with open(os.path.join(output_path, 'failure'), 'w') as f:
+            f.write(
+                f"Exception during training: {str(e)}\n{trace}"
+            )
+        # Printing this causes the exception to be in the training job logs.
+        console_msg = f"Exception during training: {str(e)}\n{trace}"
+        print(console_msg, file=sys.stderr)
+        # A non-zero exit code causes the training job to be marked as Failed.
+        sys.exit(255)
