@@ -1,48 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="4" time="81.215" timestamp="2024-03-23T00:12:39.667841" hostname="ip-10-10-6-150.eu-central-1.compute.internal"><testcase classname="tests.model.test_model.TestModel" name="test_model_fit" time="20.391"><failure message="AssertionError: assert 0.9995626981523997 &lt; 0.6">self = &lt;tests.model.test_model.TestModel testMethod=test_model_fit&gt;
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="5.198" timestamp="2024-03-23T04:03:36.057931" hostname="ip-10-10-6-150.eu-central-1.compute.internal"><testcase classname="tests.api.test_api.TestBatchPipeline" name="test_should_failed_unkown_column_1" time="0.438" /><testcase classname="tests.api.test_api.TestBatchPipeline" name="test_should_failed_unkown_column_2" time="0.068" /><testcase classname="tests.api.test_api.TestBatchPipeline" name="test_should_failed_unkown_column_3" time="0.045" /><testcase classname="tests.api.test_api.TestBatchPipeline" name="test_should_get_predict" time="0.044"><failure message="AssertionError: 400 != 200">self = &lt;tests.api.test_api.TestBatchPipeline testMethod=test_should_get_predict&gt;
 
-    def test_model_fit(
-        self
-    ):
-        features, target = self.model.preprocess(
-            data=self.data,
-            target_column="delay"
-        )
-    
-        _, features_validation, _, target_validation = train_test_split(
-            features, target, test_size=0.33, random_state=42
-        )
-    
-        self.model.fit(
-            features=features,
-            target=target
-        )
-    
-        predicted_target = self.model._model.predict(
-            features_validation
-        )
-    
-        report = classification_report(
-            target_validation, predicted_target, output_dict=True
-        )
-    
-&gt;       assert report["0"]["recall"] &lt; 0.60
-E       AssertionError: assert 0.9995626981523997 &lt; 0.6
+    def test_should_get_predict(self):
+        data = {
+            "flights": [
+                {
+                    "OPERA": "Aerolineas Argentinas",
+                    "TIPOVUELO": "N",
+                    "MES": 3
+                }
+            ]
+        }
+        # change this line to the model of chosing
+        # when("xgboost.XGBClassifier").predict(ANY).thenReturn(np.array([0]))
+        response = self.client.post("/predict", json=data)
+&gt;       self.assertEqual(response.status_code, 200)
+E       AssertionError: 400 != 200
 
-tests/model/test_model.py:88: AssertionError</failure></testcase><testcase classname="tests.model.test_model.TestModel" name="test_model_predict" time="18.579"><failure message="AssertionError: assert False&#10; +  where False = isinstance(array([0, 0, 0, ..., 0, 0, 0]), list)">self = &lt;tests.model.test_model.TestModel testMethod=test_model_predict&gt;
-
-    def test_model_predict(
-        self
-    ):
-        features = self.model.preprocess(
-            data=self.data
-        )
-    
-        predicted_targets = self.model.predict(
-            features=features
-        )
-    
-&gt;       assert isinstance(predicted_targets, list)
-E       AssertionError: assert False
-E        +  where False = isinstance(array([0, 0, 0, ..., 0, 0, 0]), list)
-
-tests/model/test_model.py:104: AssertionError</failure></testcase><testcase classname="tests.model.test_model.TestModel" name="test_model_preprocess_for_serving" time="18.477" /><testcase classname="tests.model.test_model.TestModel" name="test_model_preprocess_for_training" time="18.661" /></testsuite></testsuites>
+tests/api/test_api.py:24: AssertionError</failure></testcase></testsuite></testsuites>
